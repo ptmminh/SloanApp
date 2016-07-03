@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<link rel=stylesheet type=text/css href='{{ url_for('static',filename='style_lulu.css')}}'>
+
+<head>
+	<title>Sloan Metadata Project</title>
+</head>
+<body>
+<h1>Queried Results</h1>
+<div id="app">
+    {{ snippet|safe }}
+</div>
+
+</body>
+</html>

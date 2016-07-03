@@ -1,0 +1,72 @@
+<!doctype html>
+<title>Sloan Metadata Selection</title>
+<link rel=stylesheet type=text/css href='{{ url_for('static',filename='style_lulu.css')}}'>
+<div class=page>
+  <h1>Sections</h1>
+
+  <div class=metanav>
+    <h2>Text Search</h2>
+    <h5>Enter keywords separated by commas. For example: diabetes, job, stress</h5>
+    <form id='text_search' method='post' action='' >
+      <p>
+      <input type='text' name='name_lulu' />
+      </p>
+      <p>
+    <input type='submit' value='Search' />
+  
+    <h4>
+    <h2>Activities</h2>      
+      <form id='checkbox_page' method='post' action='table_results' >
+      
+      <h3>Job</h3>
+        <p>
+          {% for i in labs_jobs %}
+            <input type='checkbox' name='job_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
+      
+      <h3>Volunteering</h3>
+      	<p>
+          {% for i in labs_vol %}
+            <input type='checkbox' name='vol_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
+
+      <h3>Leisure</h3>
+      	<p>
+          {% for i in labs_lei %}
+            <input type='checkbox' name='lei_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
+    
+    <h2>Covariates</h2>
+
+      <h3>Demographics</h3>
+        <p>
+          {% for i in labs_demo %}
+            <input type='checkbox' name='demo_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
+      
+      <h3>Health</h3>
+        <p>
+          {% for i in labs_hlth %}
+            <input type='checkbox' name='hlth_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
+
+      <h3>Psychosocial</h3>
+        <p>
+          {% for i in labs_psysoc %}
+            <input type='checkbox' name='psysoc_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
+
+        <p>
+          <input type='submit' value='Next' />
+        </p>
+      
+      </form>
+    </h4>
+  </div>
+</div>
