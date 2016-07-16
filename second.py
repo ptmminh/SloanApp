@@ -6,7 +6,7 @@
 # of the main Sloan app framework 
 ##########################
 
-from bokeh.models import ColumnDataSource, CustomJS, Select, HoverTool
+from bokeh.models import ColumnDataSource, CustomJS, Select, HoverTool#, OpenURL, TapTool
 from bokeh.models.widgets import DataTable, TableColumn
 from bokeh.resources import CDN
 from bokeh.embed import file_html
@@ -91,10 +91,14 @@ def build_app(list_cursor):
 	#draw line and circle graph
 	hover = HoverTool(tooltips=[("wave","@Years"),\
 		("Sample Size", "@SampleSize")])
+	#url = "https://www.dropbox.com/home/Sloan%20Grant%2015-17/!!!%20New%20Files%20-%20Data%20%2B%20Codebook%20Materials/Haein"
 
 	p2 = Figure(plot_width=500, plot_height=500,\
 		title='Selected - Sample by Wave', tools = [hover])
 	p2.circle('Years', 'SampleSize', source=bar_source, size=10, color="CadetBlue", alpha=0.5)
+	# taptool = p2.select(type=TapTool)
+	# taptool.callback = OpenURL(url=url)
+	
 	tab2 = Panel(child=p2, title="circle")
 	p2.title_text_color = "CadetBlue"
 	p2.title_text_font = "helvetica"
@@ -102,6 +106,8 @@ def build_app(list_cursor):
 	p2.xaxis.axis_label_text_font_size = '9pt'
 	p2.yaxis.axis_label = "Sample Size"
 	p2.yaxis.axis_label_text_font_size = '9pt'
+
+
 
 	p1 = Figure(plot_width=500, plot_height=500,\
 		title='Selected - Sample by Wave')
