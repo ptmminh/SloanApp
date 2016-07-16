@@ -6,10 +6,10 @@
 
   <div class=metanav>
     <h2>Text Search</h2>
-    <h5>Enter keywords separated by commas. For example: diabetes, job, stress</h5>
-    <form id='text_search' method='post' action='' >
+    <h5>Enter keywords delimited by single spaces. For example: vacation industry</h5>
+    <form id='text_search' method='post' action='.' >
       <p>
-      <input type='text' name='name_lulu' />
+      <input type='text' name='search_lulu' />
       </p>
       <p>
     <input type='submit' value='Search' />
@@ -62,6 +62,12 @@
           {% endfor %}
         </p>
 
+    <h2>Cognitive</h2>
+        <p>
+          {% for i in labs_cogn %}
+            <input type='checkbox' name='cogn_gray' value="{{i}}" >{{i}} <br />
+          {% endfor %}
+        </p>
         <p>
           <input type='submit' value='Next' />
         </p>
