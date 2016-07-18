@@ -6,21 +6,19 @@
 # of the main Sloan app framework 
 ##########################
 
-from bokeh.models import ColumnDataSource, CustomJS, Select, HoverTool#, OpenURL, TapTool
-from bokeh.models.widgets import DataTable, TableColumn
+from bokeh.models import ColumnDataSource, CustomJS, Select, HoverTool
+from bokeh.models.widgets import DataTable, TableColumn, Panel, Tabs
 from bokeh.resources import CDN
 from bokeh.embed import file_html
 from bokeh.io import vform, hplot 
 from bokeh.plotting import Figure
-from bokeh.models.widgets import Panel, Tabs
 
 def build_app(list_cursor):
 	'''function to build 2nd page Bokeh app with interactions'''
 
 	#create a list of years for sample size years
 	years = [str(i) for i in range(1992,2015,2)]
-	years.insert(1,str(1993)) #the odd duck
-	years.insert(3,str(1995)) #the odd duck
+	years.insert(1,str(1993)); years.insert(3,str(1995)) #the odd ducks
 	col_lab_sam = ['Sample Size - ' + i for i in years] #sample column labels
 	col_lab_var = ['Variable Name - ' + i for i in years] #variable column labels
 	col_lab_qtxt = ['Question Text - ' + i for i in years] #question text column labels
@@ -33,7 +31,7 @@ def build_app(list_cursor):
 	col_lab_qtxt_c = ['Question Text - ' + i + ' CAMS' for i in years_c]
 	col_lab_res_c = ['Response Options - ' + i + ' CAMS' for i in years_c]
 
-	#create bokeh data table 1
+	#create results data table
 
 	l_id = []; l_q = []; l_g = []; l_n = []; l_sample = []
 	l_var = [];	l_qtext = []; l_res = []; l_cac = []; l_years = []
@@ -70,10 +68,10 @@ def build_app(list_cursor):
 	TableColumn(field = 'question', title = "Question Text",width =150),\
 	TableColumn(field = 'notes', title = "Notes",width = 50)]
 
-
 	data_table = DataTable(source=table_source, columns=columns, selectable = True, fit_columns = True)
 
-	#create table data 2 (only display after callback)
+	
+	#create selected item table data (only display after callback)
 	table_source_2 = ColumnDataSource(data=dict(years = years, var = ['na']*len(years),\
 		qtext = ['na']*len(years), res = ['na']*len(years)))
 	
@@ -84,47 +82,22 @@ def build_app(list_cursor):
 
 	data_table_2 = DataTable(source=table_source_2, columns=columns_2, selectable = True, fit_columns = True)
 
-	#create data for bar graph	
-	bar_data = dict(Years= years, SampleSize = [0]*len(years)) #placeholding zeros  
-	bar_source = ColumnDataSource(data = bar_data) #for callback later
 	
-	#draw line and circle graph
+	#create data for circle/line graphs	(only display after callback)
+	bar_data = dict(Years= years, SampleSize = [0]*len(years)) #place-holding zeros  
+	bar_source = ColumnDataSource(data = bar_data)
+	
+	#draw line and circle graphs in two tabs
 	hover = HoverTool(tooltips=[("wave","@Years"),\
 		("Sample Size", "@SampleSize")])
-	#url = "https://www.dropbox.com/home/Sloan%20Grant%2015-17/!!!%20New%20Files%20-%20Data%20%2B%20Codebook%20Materials/Haein"
+	p1 = gen_fig('circle', bar_source, tool=hover)	
+	tab1 = Panel(child=p1, title="circle")
+	p2 = gen_fig('line', bar_source)
+	tab2 = Panel(child=p2, title="line")
+	tabs = Tabs(tabs=[ tab1, tab2 ])
 
-	p2 = Figure(plot_width=500, plot_height=500,\
-		title='Selected - Sample by Wave', tools = [hover])
-	p2.circle('Years', 'SampleSize', source=bar_source, size=10, color="CadetBlue", alpha=0.5)
-	# taptool = p2.select(type=TapTool)
-	# taptool.callback = OpenURL(url=url)
-	
-	tab2 = Panel(child=p2, title="circle")
-	p2.title_text_color = "CadetBlue"
-	p2.title_text_font = "helvetica"
-	p2.xaxis.axis_label = "Wave"
-	p2.xaxis.axis_label_text_font_size = '9pt'
-	p2.yaxis.axis_label = "Sample Size"
-	p2.yaxis.axis_label_text_font_size = '9pt'
-
-
-
-	p1 = Figure(plot_width=500, plot_height=500,\
-		title='Selected - Sample by Wave')
-	p1.line('Years', 'SampleSize', source=bar_source, line_width=3, color='CadetBlue',line_alpha=0.7)
-	tab1 = Panel(child=p1, title="line")
-	p1.title_text_color = "CadetBlue"
-	p1.title_text_font = "helvetica"
-	p1.xaxis.axis_label = "Wave"
-	p1.xaxis.axis_label_text_font_size = '9pt'
-	p1.yaxis.axis_label = "Sample Size"
-	p1.yaxis.axis_label_text_font_size = '9pt'
-
-	tabs = Tabs(tabs=[ tab2, tab1 ])
-
-
-	#requires (bar_source, table_source, p1, p2, table_source_2)
-	callback_code = """
+	#requires (bar_source, table_source, table_source_2)
+	callback = """
 	var br_data = source.get('data');
 	var tbl_data = s2.get('data');
 	var tbl2_data = s3.get('data');
@@ -140,12 +113,31 @@ def build_app(list_cursor):
 	s3.trigger('change');
 	dt2.trigger('change');"""
 
-
 	#Select ID
-	id_select = Select(title='Select an ID from the table above',value='select',options=['None']+l_id, \
-		callback = CustomJS(args=dict(source=bar_source, s2=table_source, dt2 = data_table_2, \
-			s3 = table_source_2), code=callback_code))
+	id_select = Select(title='Select an ID from the table above',\
+		value ='select',options=['None']+l_id,\
+		callback = CustomJS(\
+			args = dict(source=bar_source, s2=table_source, dt2 = data_table_2, s3 = table_source_2),\
+			code = callback))
 
 	html = file_html(vform(data_table,id_select,hplot(tabs,data_table_2)), CDN, "data_table")
 
 	return html
+
+def gen_fig(shape, source, tool=''):
+	'''function to generate either a circle or line graph'''
+	p = Figure(plot_width=500, plot_height=500,\
+		title='Selected - Sample by Wave', tools = [tool])
+	p.title_text_color = "CadetBlue"
+	p.title_text_font = "helvetica"
+	p.xaxis.axis_label = "Wave"
+	p.xaxis.axis_label_text_font_size = '9pt'
+	p.yaxis.axis_label = "Sample Size"
+	p.yaxis.axis_label_text_font_size = '9pt'
+	if shape == 'circle':
+		p.circle('Years', 'SampleSize', source=source,\
+			size=10, color="CadetBlue", alpha=0.5)
+	elif shape == 'line':
+		p.line('Years', 'SampleSize', source=source,\
+			line_width=3, color='CadetBlue',line_alpha=0.7)
+	return p
