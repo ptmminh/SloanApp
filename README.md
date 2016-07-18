@@ -1,3 +1,3 @@
 # SloanApp
 
-Interactive web app for CUCM research center to navigate longitudinal study's metadata.
+Interactive web app for CUMC research center to navigate longitudinal study's metadata.
